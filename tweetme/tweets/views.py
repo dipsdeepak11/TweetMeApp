@@ -1,7 +1,13 @@
 from django.shortcuts import render
 from .models import Tweet
-from django.views.generic import ListView, DetailView
+from .forms import TweetModelForm
+from django.views.generic import ListView, DetailView, CreateView
 
+
+class TweetCreateView(CreateView):
+    form_class = TweetModelForm
+    template_name = 'tweets/forms.html'
+    Fields = ['user', 'content']
 
 class TweetListView(ListView):
     template_name = 'tweets/list_view.html'
