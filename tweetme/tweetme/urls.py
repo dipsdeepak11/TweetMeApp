@@ -23,7 +23,7 @@ from.views import home
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$',home,name='home'),
-    url(r'tweet/',include('tweets.urls')),
+    url(r'tweet/',include(('tweets.urls','tweets'),namespace='tweet')),
 
 ]
 
