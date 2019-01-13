@@ -1,6 +1,7 @@
 from django.shortcuts import render
 # from django import forms
 # from django.forms.utils import ErrorList
+from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .mixins import FormUserNeededMixin, UserOwnerMixin
 from .models import Tweet
@@ -12,7 +13,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 class TweetCreateView(FormUserNeededMixin, CreateView):
     form_class = TweetModelForm
     template_name = 'tweets/create_view.html'
-    success_url = '/tweet/create/'
+    # success_url = '/tweet/create/'
 
     # def form_valid(self, form):
     #     if self.request.user.is_authenticated:
@@ -33,11 +34,19 @@ class TweetUpdateView(LoginRequiredMixin, UserOwnerMixin, UpdateView):
 class TweetDeleteView(LoginRequiredMixin, DeleteView):
     model = Tweet
     template_name = 'tweets/delete_confirm.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('tweet:list')
 
 class TweetListView(ListView):
     template_name = 'tweets/list_view.html'
-    queryset = Tweet.objects.all()
+    # queryset = Tweet.objects.all()
+    def get_queryset(self, *args, **kwargs):
+        qs = Tweet.objects.all()
+        query = self.request.GET.get("q", None)
+        if query is not None:
+            qs = qs.filter(
+                Q(content__icontains=query) |
+                Q(user__username__icontains=query))
+        return qs
 
 class TweetDetailView(DetailView):
     queryset = Tweet.objects.all()
